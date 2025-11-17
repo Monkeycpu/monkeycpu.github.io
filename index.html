@@ -201,22 +201,27 @@
     <p>© 2025 Monkeycpu | Built with ⚡ GitHub Pages</p>
   </footer>
 
-  <!-- Safe Global Like Button Script -->
+  <!-- Global Like Button Script -->
   <script>
     const btn = document.getElementById("likeButton");
     const countEl = document.getElementById("likeCount");
 
-    // JSONBin setup
-    const BIN_ID = "691b7c9b43b1c97be9b3c4c6";      // Replace with your JSONBin ID
-    const BIN_SECRET = "";  // Optional for write access
+    const BIN_ID = "691b7f1eae596e708f5f7b2a"; // Replace with your public JSONBin ID
+    const BIN_SECRET = "";              // Leave blank for public bin
 
     async function getLikes() {
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`);
-      const data = await res.json();
-      const count = data.record.likes || 0;
-      countEl.textContent = count + (count === 1 ? " like" : " likes");
-      btn.disabled = false;
-      return count;
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`);
+        const data = await res.json();
+        const count = data.record.likes || 0;
+        countEl.textContent = count + (count === 1 ? " like" : " likes");
+        btn.disabled = false;
+        return count;
+      } catch (err) {
+        console.error("Failed to fetch likes:", err);
+        countEl.textContent = "Error";
+        btn.disabled = true;
+      }
     }
 
     async function updateLikes() {
@@ -227,7 +232,7 @@
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "X-Master-Key": BIN_SECRET
+          // No secret needed for public bin
         },
         body: JSON.stringify({ likes: currentCount })
       });
