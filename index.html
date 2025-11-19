@@ -204,102 +204,33 @@
   </footer>
 
   <script>
-    // ⚠️ IMPORTANT: Replace this with your actual JSON Bin ID!
-    // And ensure your JSON Bin is set up with: {"likes": 0}
-    const BIN_ID = "691b806cae596e708f5f7d43"; 
-    const BIN_URL = `https://api.jsonbin.io/v3/b/${691b806cae596e708f5f7d43}`;
-    const API_KEY = ""; // Use X-Master-Key if required
+    const BIN_ID = "691b806cae596e708f5f7d43";
 
-    const GET_HEADERS = {
-        'X-Master-Key': API_KEY,
-        'Content-Type': 'application/json'
-    };
-
-    const PUT_HEADERS = {
-        'Content-Type': 'application/json',
-        'X-Master-Key': API_KEY,
-        'X-Bin-Versioning': 'false' 
-    };
-    
     let liked = localStorage.getItem("liked") === "true";
-    let count = 0; 
+    let storedCount = localStorage.getItem("likeCount");
+    let count = storedCount ? Number(storedCount) : 0;
 
     const btn = document.getElementById("likeButton");
     const countEl = document.getElementById("likeCount");
 
-    /**
-     * Updates the UI elements (button state and count display).
-     */
     function updateUI() {
       btn.disabled = liked;
       btn.textContent = liked ? "Liked ✓" : "Like";
       countEl.textContent = count + (count === 1 ? " like" : " likes");
     }
 
-    /**
-     * Fetches the current like count from JSON Bin, using the 'likes' key.
-     */
-    async function fetchCount() {
-      try {
-        const response = await fetch(BIN_URL, {
-          method: 'GET',
-          headers: GET_HEADERS
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        
-        // Read the 'likes' key from the bin
-        count = data.record.likes || 0; 
+    updateUI();
 
-      } catch (error) {
-        console.error("Error fetching like count:", error);
-      } finally {
-        updateUI(); 
-      }
-    }
-
-    /**
-     * Updates the like count in JSON Bin, writing to the 'likes' key.
-     */
-    async function updateBin() {
-      try {
-        // Write the updated count to the 'likes' key
-        const response = await fetch(BIN_URL, {
-          method: 'PUT',
-          headers: PUT_HEADERS,
-          body: JSON.stringify({ likes: count }) 
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-      } catch (error) {
-        console.error("Error updating like count:", error);
-      }
-    }
-
-    // --- Main Logic ---
-
-    // 1. Fetch the remote count on page load
-    fetchCount(); 
-
-    // 2. Add the click listener
     btn.addEventListener("click", () => {
       if (liked) return;
 
-      // Optimistic Update: Update locally first
       liked = true;
       count++;
 
-      // Save user's like state to local storage
-      localStorage.setItem("liked", "true"); 
+      localStorage.setItem("liked", "true");
+      localStorage.setItem("likeCount", count);
 
-      // Update UI immediately
-      updateUI(); 
-
-      // Update the remote database asynchronously
-      updateBin();
+      updateUI();
     });
   </script>
 
